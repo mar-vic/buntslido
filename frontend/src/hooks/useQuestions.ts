@@ -32,5 +32,9 @@ export function useQuestions(initial: Question[] = []) {
     })
   }, [])
 
-  return { questions, setInitial, handleWsMessage }
+  const removeQuestion = useCallback((id: number) => {
+    setQuestions((prev) => prev.filter((q) => q.id !== id))
+  }, [])
+
+  return { questions, setInitial, handleWsMessage, removeQuestion }
 }

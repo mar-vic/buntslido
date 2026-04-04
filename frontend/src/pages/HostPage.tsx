@@ -14,9 +14,10 @@ export function HostPage() {
   const { joinCode } = useParams<{ joinCode: string }>()
   const { hostToken } = useRole()
   const [event, setEvent] = useState<Event | null>(null)
-  const [error, setError] = useState<string | null>(null)
+  const [loadError, setLoadError] = useState<string | null>(null)
+  const [actionError, setActionError] = useState<string | null>(null)
   const [upvotedIds] = useState<Set<number>>(new Set())
-  const { questions, setInitial, handleWsMessage } = useQuestions()
+  const { questions, setInitial, handleWsMessage, removeQuestion } = useQuestions()
 
   useEffect(() => {
     if (!joinCode || !hostToken) return
@@ -25,7 +26,7 @@ export function HostPage() {
         setEvent(ev)
         setInitial(qs)
       })
-      .catch((err) => setError((err as Error).message))
+      .catch((err) => setLoadError((err as Error).message))
   }, [joinCode, hostToken])
 
   function onWsMessage(msg: WsMessage) {
@@ -39,37 +40,66 @@ export function HostPage() {
   useWebSocket(joinCode, onWsMessage)
 
   async function handleSubmit(body: string) {
-    await submitQuestion(joinCode!, body)
+    try {
+      await submitQuestion(joinCode!, body)
+    } catch (err) {
+      setActionError((err as Error).message)
+    }
   }
 
   async function handleUpvote(id: number) {
     if (upvotedIds.has(id)) return
-    await upvoteQuestion(joinCode!, id)
+    try {
+      await upvoteQuestion(joinCode!, id)
+    } catch (err) {
+      setActionError((err as Error).message)
+    }
   }
 
   async function handleStatusChange(id: number, status: QuestionStatus) {
-    await updateQuestionStatus(joinCode!, id, status, hostToken!)
+    try {
+      await updateQuestionStatus(joinCode!, id, status, hostToken!)
+    } catch (err) {
+      setActionError((err as Error).message)
+    }
   }
 
   async function handleDelete(id: number) {
-    await deleteQuestion(joinCode!, id, hostToken!)
+    try {
+      await deleteQuestion(joinCode!, id, hostToken!)
+      removeQuestion(id)
+    } catch (err) {
+      setActionError((err as Error).message)
+    }
   }
 
   async function toggleActive() {
     if (!event) return
-    const updated = await updateEvent(joinCode!, { is_active: !event.is_active }, hostToken!)
-    setEvent(updated)
+    try {
+      const updated = await updateEvent(joinCode!, { is_active: !event.is_active }, hostToken!)
+      setEvent(updated)
+    } catch (err) {
+      setActionError((err as Error).message)
+    }
   }
 
-  if (!hostToken) return <p style={{ color: '#c62828', padding: '2rem' }}>Missing host token.</p>
-  if (error) return <p style={{ color: '#c62828', padding: '2rem' }}>{error}</p>
+  if (!hostToken) return <p style={{ color: '#e57373', padding: '2rem' }}>Missing host token.</p>
+  if (loadError) return <p style={{ color: '#e57373', padding: '2rem' }}>{loadError}</p>
   if (!event) return <p style={{ padding: '2rem' }}>Loading…</p>
 
   return (
     <div style={{ maxWidth: 680, margin: '2rem auto', padding: '0 1rem' }}>
       <EventHeader title={event.title} joinCode={event.join_code} isActive={event.is_active} />
+      {actionError && (
+        <p
+          style={{ color: '#e57373', margin: '0 0 1rem', cursor: 'pointer', fontSize: '0.9rem' }}
+          onClick={() => setActionError(null)}
+        >
+          ⚠ {actionError} (click to dismiss)
+        </p>
+      )}
       <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
-        <button onClick={toggleActive} style={{ cursor: 'pointer' }}>
+        <button onClick={toggleActive}>
           {event.is_active ? 'Close session' : 'Reopen session'}
         </button>
       </div>
