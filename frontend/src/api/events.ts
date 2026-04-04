@@ -5,7 +5,7 @@ export interface CreateEventResponse extends Event {
   host_token: string
 }
 
-export function listEvents(): Promise<Event[]> {
+export function listEvents(): Promise<CreateEventResponse[]> {
   return request('/events')
 }
 

@@ -1,9 +1,20 @@
 const BASE = '/api'
 
+function generateUUID(): string {
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+    return crypto.randomUUID()
+  }
+  // Fallback for non-secure contexts (HTTP on LAN)
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+    const r = (Math.random() * 16) | 0
+    return (c === 'x' ? r : (r & 0x3) | 0x8).toString(16)
+  })
+}
+
 function getAuthorToken(): string {
   let token = localStorage.getItem('buntslido_author_token')
   if (!token) {
-    token = crypto.randomUUID()
+    token = generateUUID()
     localStorage.setItem('buntslido_author_token', token)
   }
   return token
