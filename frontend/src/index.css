@@ -1,0 +1,83 @@
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  --color-border: #444;
+  --color-card-bg: #2e2e2e;
+  --color-card-answered-bg: #1a2e1a;
+  --color-card-archived-bg: #2a2a2a;
+  --color-muted-bg: #333;
+  --color-text-muted: #aaa;
+  --color-link: #7b9fff;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    color: #213547;
+    background-color: #ffffff;
+
+    --color-border: #ddd;
+    --color-card-bg: #fff;
+    --color-card-answered-bg: #f1f8e9;
+    --color-card-archived-bg: #fafafa;
+    --color-muted-bg: #f4f4f4;
+    --color-text-muted: #666;
+    --color-link: #1565c0;
+  }
+}
+
+a {
+  font-weight: 500;
+  color: var(--color-link);
+  text-decoration: inherit;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+h1 {
+  font-size: 2.4em;
+  line-height: 1.1;
+}
+
+button {
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  padding: 0.5em 1em;
+  font-size: 0.95em;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  background-color: transparent;
+  color: inherit;
+  transition: border-color 0.2s;
+}
+button:hover:not(:disabled) {
+  border-color: #646cff;
+}
+button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+input, textarea {
+  background-color: var(--color-muted-bg);
+  color: inherit;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 1em;
+}
