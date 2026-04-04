@@ -109,9 +109,9 @@ export function HomePage() {
                   </div>
                   <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
                     {token && (
-                      <Link to={`/event/${ev.join_code}/host?t=${token}`}>Manage →</Link>
+                      <Link to={`/event/${ev.join_code}/host?t=${token}`}>Manage ⚙</Link>
                     )}
-                    <Link to={`/event/${ev.join_code}`} style={{ color: 'var(--color-text-muted)' }}>Join</Link>
+                    <Link to={`/event/${ev.join_code}`} style={{ color: '#4caf50' }}>Join →</Link>
                     <button
                       onClick={() => handleDelete(ev.join_code)}
                       style={{ fontSize: '0.8rem', color: '#e57373', padding: '0.25rem 0.5rem' }}
