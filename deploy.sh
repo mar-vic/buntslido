@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# REPO_DIR="$(cd "$(dirname "$0")" && pwd)"
-REPO_DIR="~/buntslido"
+REPO_DIR="$(cd "$(dirname "$0")" && pwd)"
+# REPO_DIR="~/buntslido"
 
 echo "==> Pulling latest code..."
 git -C "$REPO_DIR" pull
