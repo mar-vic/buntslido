@@ -1,8 +1,9 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
 
 from .. import crud, schemas
 from ..dependencies import get_db, get_event_or_404, verify_host
+from ..limiter import limiter
 from ..models import Event, QuestionStatus
 from ..ws_manager import manager
 
@@ -39,7 +40,9 @@ def list_all_questions(
 
 
 @router.post("", response_model=schemas.QuestionResponse, status_code=201)
+@limiter.limit("10/minute")
 async def create_question(
+    request: Request,
     data: schemas.QuestionCreate,
     event: Event = Depends(get_event_or_404),
     db: Session = Depends(get_db),
@@ -55,7 +58,9 @@ async def create_question(
 
 
 @router.post("/{question_id}/upvote", response_model=schemas.QuestionResponse)
+@limiter.limit("30/minute")
 async def upvote_question(
+    request: Request,
     question_id: int,
     data: schemas.QuestionUpvote,
     event: Event = Depends(get_event_or_404),

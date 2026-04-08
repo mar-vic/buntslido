@@ -5,8 +5,11 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
+from slowapi.errors import RateLimitExceeded
+from slowapi import _rate_limit_exceeded_handler
 
 from .database import Base, engine
+from .limiter import limiter
 from .routers import events, questions, websocket
 
 FRONTEND_DIST = os.path.join(os.path.dirname(__file__), "../../frontend/dist")
@@ -29,11 +32,21 @@ async def lifespan(app: FastAPI):
     yield
 
 
-app = FastAPI(title="Buntslido", lifespan=lifespan)
+docs_enabled = os.getenv("ENABLE_DOCS", "false").lower() == "true"
+app = FastAPI(
+    title="Buntslido",
+    lifespan=lifespan,
+    docs_url="/docs" if docs_enabled else None,
+    redoc_url="/redoc" if docs_enabled else None,
+)
 
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
+allowed_origin = os.getenv("ALLOWED_ORIGIN", "*")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[allowed_origin],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

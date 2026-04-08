@@ -1,8 +1,9 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request
 from sqlalchemy.orm import Session
 
 from .. import crud, schemas
 from ..dependencies import get_db, get_event_or_404, verify_host
+from ..limiter import limiter
 from ..models import Event
 from ..ws_manager import manager
 
@@ -15,7 +16,8 @@ def list_events(db: Session = Depends(get_db)):
 
 
 @router.post("", response_model=schemas.EventCreateResponse, status_code=201)
-def create_event(data: schemas.EventCreate, db: Session = Depends(get_db)):
+@limiter.limit("5/minute")
+def create_event(request: Request, data: schemas.EventCreate, db: Session = Depends(get_db)):
     event = crud.create_event(db, data)
     return event
 

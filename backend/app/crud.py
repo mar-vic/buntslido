@@ -1,3 +1,4 @@
+import hashlib
 import secrets
 import string
 from sqlalchemy.orm import Session
@@ -48,7 +49,8 @@ def get_questions(db: Session, event_id: int, include_archived: bool = False) ->
 
 
 def create_question(db: Session, event_id: int, data: schemas.QuestionCreate) -> models.Question:
-    question = models.Question(event_id=event_id, body=data.body, author_token=data.author_token)
+    token_hash = hashlib.sha256(data.author_token.encode()).hexdigest()
+    question = models.Question(event_id=event_id, body=data.body, author_token=token_hash)
     db.add(question)
     db.commit()
     db.refresh(question)
