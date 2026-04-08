@@ -9,7 +9,7 @@ from ..ws_manager import manager
 router = APIRouter(prefix="/api/events", tags=["events"])
 
 
-@router.get("", response_model=list[schemas.EventCreateResponse])
+@router.get("", response_model=list[schemas.EventResponse])
 def list_events(db: Session = Depends(get_db)):
     return db.query(Event).order_by(Event.created_at.desc()).all()
 
