@@ -17,8 +17,8 @@ export function getEvent(joinCode: string): Promise<Event> {
   return request(`/events/${joinCode}`)
 }
 
-export function deleteEvent(joinCode: string): Promise<void> {
-  return request(`/events/${joinCode}`, { method: 'DELETE' })
+export function deleteEvent(joinCode: string, hostToken: string): Promise<void> {
+  return request(`/events/${joinCode}`, { method: 'DELETE', hostToken })
 }
 
 export function updateEvent(

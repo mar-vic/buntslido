@@ -28,7 +28,7 @@ def get_event(event: Event = Depends(get_event_or_404)):
 @router.delete("/{join_code}", status_code=204)
 def delete_event(
     db: Session = Depends(get_db),
-    event: Event = Depends(get_event_or_404),
+    event: Event = Depends(verify_host),
 ):
     db.delete(event)
     db.commit()

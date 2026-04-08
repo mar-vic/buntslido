@@ -15,7 +15,13 @@ export function HomePage() {
   const navigate = useNavigate()
 
   useEffect(() => {
-    listEvents().then((evs) => setEvents(evs as EventWithToken[])).catch(() => {})
+    listEvents().then((evs) => {
+      const enriched = evs.map((ev) => ({
+        ...ev,
+        host_token: localStorage.getItem(`buntslido_host_${ev.join_code}`) ?? '',
+      }))
+      setEvents(enriched)
+    }).catch(() => {})
   }, [])
 
   async function handleCreate(e: React.FormEvent) {
@@ -25,6 +31,7 @@ export function HomePage() {
     setError(null)
     try {
       const event = await createEvent(title.trim())
+      localStorage.setItem(`buntslido_host_${event.join_code}`, event.host_token)
       navigate(`/event/${event.join_code}/host?t=${event.host_token}`)
     } catch (err) {
       setError((err as Error).message)
@@ -32,8 +39,8 @@ export function HomePage() {
     }
   }
 
-  async function handleDelete(joinCode: string) {
-    await deleteEvent(joinCode)
+  async function handleDelete(joinCode: string, hostToken: string) {
+    await deleteEvent(joinCode, hostToken)
     setEvents((prev) => prev.filter((ev) => ev.join_code !== joinCode))
   }
 
@@ -86,7 +93,7 @@ export function HomePage() {
                   <Link to={`/event/${ev.join_code}/host?t=${ev.host_token}`}>Manage ⚙</Link>
                   <Link to={`/event/${ev.join_code}`} style={{ color: '#4caf50' }}>Join →</Link>
                   <button
-                    onClick={() => handleDelete(ev.join_code)}
+                    onClick={() => handleDelete(ev.join_code, ev.host_token)}
                     style={{ fontSize: '0.8rem', color: '#e57373', padding: '0.25rem 0.5rem' }}
                   >
                     Delete
